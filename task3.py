@@ -13,21 +13,20 @@ def get_indices(N, n_batches, split_ratio):
     Returns:
         generator for batch indices [i, j, k]
     """
-    inds = np.array([0, 0, 0])
-    for i in range(n_batches):
-        # todo: move forward batch
-        # calculate new indices
-        yield inds
+    dx = (N - 1) / (n_batches + 1/split_ratio)
+    dy = (1/split_ratio) * dx
+    i = 0
+    j = dy
+    k = dx + j
+    for c in range(n_batches):
+        yield (i, j, k)
+        i += dx
+        j += dx
+        k += dx
 
 def main():
     for inds in get_indices(100, 5, 0.25):
         print(inds)
-    # expected result:
-    # [0, 44, 55]
-    # [11, 55, 66]
-    # [22, 66, 77]
-    # [33, 77, 88]
-    # [44, 88, 99]
 
 if __name__ == "__main__":
     main()
