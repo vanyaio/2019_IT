@@ -1,0 +1,21 @@
+$v_val: ;
+$xlen: $ylen: ;
+$x_beg: $x_end: $t_beg: $t_end:;
+$dx:(x_end-x_beg)/(xlen-1) $dt:(t_end-t_beg)/(tlen-1);
+
+phi(t, x) := %e^(-(x - 4*t)^2 / (4*v_val*(t+1))) + %e^(-(x - 4*t - 2*%pi)^2 / (4*v_val*(t+1)));
+dphi(t, x) := ''(diff(phi(t, x), x, 1));
+u_init(t, x) := -2*v_val*(1 / phi(t,x))*dphi(t,x) + 4;
+
+for x:1 thru xlen for t:1 thru tlen do
+(arraymake(u, [t, x]), u[t, x]:0)$
+
+for x:1 thru xlen do
+(u[1,x]:u_init(0,x_beg+(x-1)*dx) u[2, x]:u[1,x])$
+
+for t=2 thru tlen-1 do for x:2 thru xlen-1 do
+u[t + 1, x]:float(dt*(-u[t,x]*(u[t,x]-u[t,x-1])/dx + v_val*((u[t,x+1]-2*u[t,x]+u[t,x-1])/(dx*dx)))-u[t,x]),numer$
+
+f(x,y) := float(u[round(x), round(y)])$
+
+plot3d(f, [x,1,tlen], [y,1,xlen], [plot_format,gnuplot])$
